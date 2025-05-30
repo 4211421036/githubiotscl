@@ -1,0 +1,52 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: temurin
+
+      - name: Setup sbt
+        uses: olafurpg/setup-scala@v13
+        with:
+          java-version: 11
+          sbt-version: 1.9.0
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+            ~/.coursier
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
+
+      - name: Publish to Sonatype (Scala Index)
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+        run: |
+          # Setup PGP
+          echo "$PGP_SECRET" | gpg --batch --import
+          # Publish
+          sbt +publishSigned sonatypeBundleRelease
