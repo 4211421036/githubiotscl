@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
         "scm:git@github.com/4211421036/githubiotscl/.git"
       )
     ),
-    publishTo := Some("GitHub Package Registry" at "https://maven.pkg.github.com/4211421036/githubiotscl"),
-    credentials += Credentials(Path.userHome / ".github" / ".credentials"),
-    publishMavenStyle := true
+    publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/${organization.value}")
+    credentials += Credentials(Path.userHome / ".sbt" / "credentials.sbt")
+    ThisBuild / versionScheme := Some("early-semver")
   )
