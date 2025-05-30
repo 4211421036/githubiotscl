@@ -3,7 +3,13 @@ ThisBuild / version := "1.0.0"
 ThisBuild / scalaVersion := "2.13.14"
 ThisBuild / versionScheme := Some("early-semver")
 
-credentials += Credentials(Path.userHome / ".sbt" / "credentials.sbt")
+// Ganti ini supaya credentials benar di-load, bukan dari file .sbt (karena sbt biasanya baca .credentials)
+credentials += Credentials(
+  "GitHub Package Registry",
+  "maven.pkg.github.com",
+  sys.env.getOrElse("GH_USERNAME", ""),
+  sys.env.getOrElse("GH_TOKEN", "")
+)
 
 lazy val root = (project in file("."))
   .settings(
@@ -17,8 +23,15 @@ lazy val root = (project in file("."))
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/4211421036/githubiotscl/"),
-        "scm:git@github.com/4211421036/githubiotscl.git"
+        "scm:git@github.com:4211421036/githubiotscl.git" // gunakan ":" bukan "/" setelah github.com
       )
     ),
-    publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/${organization.value}")
+    publishMavenStyle := true,  // penting supaya sbt tahu ini maven style repo
+    publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/4211421036/githubiotscl"), // harus repo owner dan repo name bukan cuma org
+    
+    // Opsional, untuk men-disable publish docs jar jika tidak perlu:
+    publishArtifact in (Compile, packageDoc) := false,
+    
+    // Supaya artifact signed (kalau mau, tapi bisa skip dulu):
+    // enablePlugins(PgpPlugin)
   )
