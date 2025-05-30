@@ -1,6 +1,9 @@
 ThisBuild / organization := "com.pelajaran.githubiot"
 ThisBuild / version := "1.0.0"
 ThisBuild / scalaVersion := "2.13.14"
+ThisBuild / versionScheme := Some("early-semver")
+
+credentials += Credentials(Path.userHome / ".sbt" / "credentials.sbt")
 
 lazy val root = (project in file("."))
   .settings(
@@ -14,10 +17,8 @@ lazy val root = (project in file("."))
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/4211421036/githubiotscl/"),
-        "scm:git@github.com/4211421036/githubiotscl/.git"
+        "scm:git@github.com/4211421036/githubiotscl.git"
       )
     ),
     publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/${organization.value}")
-    credentials += Credentials(Path.userHome / ".sbt" / "credentials.sbt")
-    ThisBuild / versionScheme := Some("early-semver")
   )
