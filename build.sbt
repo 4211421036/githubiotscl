@@ -1,19 +1,22 @@
-// Info umum build
+// General project info
 ThisBuild / organization := "com.pelajaran.githubiot"
-ThisBuild / version := "1.0.0"
+ThisBuild / version      := "1.0.0"
 ThisBuild / scalaVersion := "2.13.14"
 ThisBuild / versionScheme := Some("early-semver")
 
-// Untuk publish ke Maven Central (termasuk Scala Index)
-ThisBuild / publishTo := sonatypePublishToBundle.value
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
-ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
+// GitHub Packages publishing settings
+ThisBuild / publishMavenStyle := true
+ThisBuild / publishTo := Some(
+  "GitHub Package Registry" at "https://maven.pkg.github.com/4211421036/githubiotscl"
+)
 
-// Definisi project root
+// Project definition
 lazy val root = (project in file("."))
   .settings(
     name := "githubiot",
     description := "Library to send IoT data to GitHub from Scala",
+    
+    // Metadata for GitHub Packages
     licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/4211421036/githubiotscl")),
     developers := List(
@@ -30,14 +33,16 @@ lazy val root = (project in file("."))
         "scm:git:git@github.com:4211421036/githubiotscl.git"
       )
     ),
-    
-    // Wajib untuk publish ke Maven Central/Scala Index
-    publishMavenStyle := true,
-    
-    // Wajib: generate dokumen dan source
-    publishArtifact in (Compile, packageDoc) := true,
-    publishArtifact in (Compile, packageSrc) := true,
-    
-    // Optional: signing untuk Maven Central
-    // publish/skip := true, // skip publish untuk development
+
+    // Optional: Disable docs if not needed
+    Compile / packageDoc / publishArtifact := false,
+    Compile / packageSrc / publishArtifact := true
   )
+
+// Load GitHub credentials from environment variables
+credentials += Credentials(
+  "GitHub Package Registry",
+  "maven.pkg.github.com",
+  sys.env.getOrElse("GITHUB_USERNAME", ""),
+  sys.env.getOrElse("GITHUB_TOKEN", "")
+)
