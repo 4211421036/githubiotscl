@@ -1,0 +1,33 @@
+name: Scala Package Publish
+
+on:
+  push:
+    branches:
+      - main  # atau branch lainnya yang kamu gunakan
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+     - name: Checkout
+       uses: actions/checkout@v4
+    
+     - name: Setup Java
+       uses: actions/setup-java@v4
+       with:
+        distribution: temurin
+        java-version: 17
+    
+     - name: Install sbt
+       uses: coursier/setup-action@v1
+       with:
+        apps: sbt
+    
+     - name: Setup credentials
+       run: |
+        mkdir -p ~/.sbt
+        echo "credentials += Credentials(\"GitHub Package Registry\", \"maven.pkg.github.com\", \"${{ github.actor }}\", \"${{ secrets.GITHUB_TOKEN }}\")" > ~/.sbt/credentials.sbt
+  
+     - name: Publish
+       run: sbt publish
