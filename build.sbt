@@ -1,16 +1,18 @@
+// Info umum build
 ThisBuild / organization := "com.pelajaran.githubiot"
 ThisBuild / version := "1.0.0"
 ThisBuild / scalaVersion := "2.13.14"
 ThisBuild / versionScheme := Some("early-semver")
 
-// Ganti ini supaya credentials benar di-load, bukan dari file .sbt (karena sbt biasanya baca .credentials)
+// Credentials di-load dari environment variables GH_USERNAME dan GH_TOKEN
 credentials += Credentials(
-  "GitHub Package Registry",
-  "maven.pkg.github.com",
-  sys.env.getOrElse("GH_USERNAME", ""),
-  sys.env.getOrElse("GH_TOKEN", "")
+  "GitHub Package Registry",                // Harus ini supaya sbt cocok dengan server GitHub
+  "maven.pkg.github.com",                    // Host GitHub Packages
+  sys.env.getOrElse("GH_USERNAME", ""),     // Username dari env var GH_USERNAME
+  sys.env.getOrElse("GH_TOKEN", "")         // Token dari env var GH_TOKEN
 )
 
+// Definisi project root
 lazy val root = (project in file("."))
   .settings(
     name := "githubiot",
@@ -18,20 +20,27 @@ lazy val root = (project in file("."))
     licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/4211421036/githubiotscl/")),
     developers := List(
-      Developer("4211421036", "GALIH RIDHO UTOMO", "g4lihru@students.unnes.ac.id", url("https://github.com/4211421036"))
+      Developer(
+        "4211421036",
+        "GALIH RIDHO UTOMO",
+        "g4lihru@students.unnes.ac.id",
+        url("https://github.com/4211421036")
+      )
     ),
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/4211421036/githubiotscl/"),
-        "scm:git@github.com:4211421036/githubiotscl.git" // gunakan ":" bukan "/" setelah github.com
+        "scm:git@github.com:4211421036/githubiotscl.git"  // gunakan ':' bukan '/'
       )
     ),
-    publishMavenStyle := true,  // penting supaya sbt tahu ini maven style repo
-    publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/4211421036/githubiotscl"), // harus repo owner dan repo name bukan cuma org
     
-    // Opsional, untuk men-disable publish docs jar jika tidak perlu:
-    publishArtifact in (Compile, packageDoc) := false,
+    publishMavenStyle := true,    // Wajib untuk publish ke Maven repositori
     
-    // Supaya artifact signed (kalau mau, tapi bisa skip dulu):
-    // enablePlugins(PgpPlugin)
+    // Publish ke GitHub Packages URL, ganti sesuai owner dan repo kamu
+    publishTo := Some(
+      "GitHub Package Registry" at s"https://maven.pkg.github.com/4211421036/githubiotscl"
+    ),
+    
+    // Optional: kalau tidak ingin generate javadoc jar (docs)
+    publishArtifact in (Compile, packageDoc) := false
   )
