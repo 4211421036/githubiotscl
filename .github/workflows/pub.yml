@@ -18,11 +18,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17' # sesuaikan versi kamu
 
-      - name: Setup sbt
+      - name: Install sbt
         run: |
-          curl -L -o sbt.deb https://github.com/sbt/sbt/releases/download/v1.9.0/sbt-1.9.0.deb
-          sudo dpkg -i sbt.deb
-          sbt sbtVersion
+          echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+          curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | sudo apt-key add
+          sudo apt-get update
+          sudo apt-get install sbt
 
       - name: Build with sbt
         env:
